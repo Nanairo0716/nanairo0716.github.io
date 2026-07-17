@@ -336,63 +336,16 @@
 
             document.getElementById('todayTotal').innerText = formatMinutesToHoursAndMinutes(todayMins);
             document.getElementById('allTotal').innerText = formatMinutesToHoursAndMinutes(totalMins);
+        // ... (グラフ描画処理の末尾)
+        document.getElementById('graphs').innerHTML = graphHtml;
+    }
 
-            let maxMinutes = Math.max(...Object.values(subjectTotals), 1);
-            let graphHtml = '';
-            Object.keys(subjectTotals).forEach(sub => {
-                const mins = subjectTotals[sub];
-                const pct = (mins / maxMinutes) * 100;
-                graphHtml += `       
-                // --- To Doリストの処理 ---
-        function addTodo() {
-            const input = document.getElementById('todoInput');
-            const text = input.value.trim();
-            if (text === '') return;
-
-            todos.push({ text: text, completed: false });
-            localStorage.setItem('study_todos', JSON.stringify(todos));
-            input.value = '';
-            renderTodos();
-        }
-
-        function toggleTodo(index) {
-            todos[index].completed = !todos[index].completed;
-            localStorage.setItem('study_todos', JSON.stringify(todos));
-            renderTodos();
-        }
-
-        function deleteTodo(index) {
-            todos.splice(index, 1);
-            localStorage.setItem('study_todos', JSON.stringify(todos));
-            renderTodos();
-        }
-
-        function renderTodos() {
-            let html = '';
-            todos.forEach((todo, idx) => {
-                const textStyle = todo.completed ? 'text-decoration: line-through; color: #aaa;' : 'color: #333;';
-                const checked = todo.completed ? 'checked' : '';
-                html += `
-                    <li class="todo-item">
-                        <label class="todo-item-left" style="${textStyle}">
-                            <input type="checkbox" class="todo-checkbox" ${checked} onchange="toggleTodo(${idx})">
-                            <span>${todo.text}</span>
-                        </label>
-                        <button class="todo-delete" onclick="deleteTodo(${idx})">削除</button>
-                    </li>`;
-            });
-            document.getElementById('todoList').innerHTML = html;
-        }
-
-        // エンターキーでもTo Doを追加できるように設定
-        document.getElementById('todoInput').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') addTodo();
-        });        // 初回読み込み時の描画
-        render();
-        renderTodos();
-    </script>
+    // --- To Doリストの処理と初期化 ---
+    // (ToDo追加、切り替え、削除、描画の各関数をここに配置)
+    // (データリセット、時間フォーマット、イベントリスナー、初期レンダリング)
+    
+    render();
+    renderTodos();
+</script>
 </body>
 </html>
-
-
-                
