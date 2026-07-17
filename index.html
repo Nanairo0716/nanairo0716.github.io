@@ -150,22 +150,23 @@
         });
         document.getElementById('historyBody').innerHTML = html;
 
-        document.getElementById('todayTotal').innerText = (todayMins / 60).toFixed(1) + ' 時間';
-        document.getElementById('allTotal').innerText = (totalMins / 60).toFixed(1) + ' 時間';
+        // 【修正点①】デカ文字部分を〇時間〇分表示に変更
+        document.getElementById('todayTotal').innerText = formatMinutesToHoursAndMinutes(todayMins);
+        document.getElementById('allTotal').innerText = formatMinutesToHoursAndMinutes(totalMins);
 
         let maxMinutes = Math.max(...Object.values(subjectTotals), 1);
         let graphHtml = '';
         Object.keys(subjectTotals).forEach(sub => {
             const mins = subjectTotals[sub];
             const pct = (mins / maxMinutes) * 100;
-            const hrs = (mins / 60).toFixed(1);
+            // 【修正点②】各教科の数値を〇時間〇分表示に変更
             graphHtml += `
                 <div class="bar-row">
                     <div class="bar-label">${sub}</div>
                     <div class="bar-outer">
                         <div class="bar-inner" style="width: ${pct}%; background-color: ${colors[sub] || '#ccc'}"></div>
                     </div>
-                    <div class="bar-time">${hrs} 時間</div>
+                    <div class="bar-time">${formatMinutesToHoursAndMinutes(mins)}</div>
                 </div>`;
         });
         document.getElementById('graphs').innerHTML = graphHtml;
@@ -176,6 +177,20 @@
             localStorage.removeItem('study_logs');
             logs = [];
             render();
+        }
+    }
+
+    // 分を「〇時間〇分」または「〇分」の文字列に変換する関数
+    function formatMinutesToHoursAndMinutes(totalMinutes) {
+        if (totalMinutes === 0) return "0分";
+        
+        const hours = Math.floor(totalMinutes / 60);
+        const minutes = totalMinutes % 60;
+        
+        if (hours > 0) {
+            return `${hours}時間 ${minutes}分`;
+        } else {
+            return `${minutes}分`;
         }
     }
 
