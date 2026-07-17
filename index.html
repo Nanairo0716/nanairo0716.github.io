@@ -203,7 +203,55 @@
             return `${minutes}分`;
         }
     }
+    
+    // --- To Doリストの追加と画面描画 ---
+function addTodo() {
+    const input = document.getElementById('todoInput');
+    const text = input.value.trim();
+    if (text === '') return;
 
+    todos.push({ text: text, completed: false });
+    localStorage.setItem('study_todos', JSON.stringify(todos));
+    input.value = '';
+    renderTodos();
+}
+
+function renderTodos() {
+    let html = '';
+    todos.forEach((todo, idx) => {
+        const textStyle = todo.completed ? 'text-decoration: line-through; color: #aaa;' : 'color: #333;';
+        const checked = todo.completed ? 'checked' : '';
+        html += `
+            <li style="display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee;">
+                <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; flex: 1; ${textStyle}">
+                    <input type="checkbox" ${checked} onchange="toggleTodo(${idx})" style="transform: scale(1.1);">
+                    <span>${todo.text}</span>
+                </label>
+                <button onclick="deleteTodo(${idx})" style="background: none; border: none; color: #ff8c00; cursor: pointer; font-size: 13px; font-weight: bold; padding: 0; margin: 0;">削除</button>
+            </li>`;
+    });
+    document.getElementById('todoList').innerHTML = html;
+}
+    function toggleTodo(index) {
+    todos[index].completed = !todos[index].completed;
+    localStorage.setItem('study_todos', JSON.stringify(todos));
+    renderTodos();
+}
+
+function deleteTodo(index) {
+    todos.splice(index, 1);
+    localStorage.setItem('study_todos', JSON.stringify(todos));
+    renderTodos();
+}
+
+// エンターキーでもTo Doを追加できるように設定
+document.getElementById('todoInput').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') addTodo();
+});
+
+// 初回読み込み時にTo Doリストを描画
+renderTodos();
+    
     render();
 </script>
 </body>
