@@ -337,15 +337,45 @@
             document.getElementById('todayTotal').innerText = formatMinutesToHoursAndMinutes(todayMins);
             document.getElementById('allTotal').innerText = formatMinutesToHoursAndMinutes(totalMins);
         // ... (グラフ描画処理の末尾)
+        // グラフ描画（省略）
+        // （中略：ここに以前あったグラフ生成コードを配置）
         document.getElementById('graphs').innerHTML = graphHtml;
     }
 
-    // --- To Doリストの処理と初期化 ---
-    // (ToDo追加、切り替え、削除、描画の各関数をここに配置)
-    // (データリセット、時間フォーマット、イベントリスナー、初期レンダリング)
-    
-    render();
-    renderTodos();
-</script>
+    // --- To Doリスト追加 ---
+    function addTodo() {
+        // (関数の中身を復元)
+        todos.push({ text: input.value.trim(), completed: false });
+        localStorage.setItem('study_todos', JSON.stringify(todos));
+        // ... (以下略)
+    }       
+    // (先ほど提示したTo Do管理、時間フォーマット、初期化処理のJavaScriptコードをここにコピペします)
+        function toggleTodo(index) {
+            // ... (省略)
+        }
+
+        function deleteTodo(index) {
+            // ... (省略)
+        }
+
+        function renderTodos() {
+            // ... (省略)
+        }
+
+        function clearData() {
+            // ... (省略)
+        }
+
+        function formatMinutesToHoursAndMinutes(totalMinutes) {
+            // ... (省略)
+        }
+
+        document.getElementById('todoInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') addTodo();
+        });
+
+        render();
+        renderTodos();
+    </script>
 </body>
 </html>
