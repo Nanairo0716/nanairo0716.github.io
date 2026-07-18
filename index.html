@@ -370,27 +370,33 @@ document.getElementById('todoInput').addEventListener('keypress', (e) => {
 renderTodos();
     
     render();
-            // 🍅 時間がゼロになったときに集中と休憩をループさせる関数
-        function handlePomodoroEnd() {
-            clearInterval(timerIdx);
-            
-            const work = Number(document.getElementById('workMinutes').value);
-            const rest = Number(document.getElementById('breakMinutes').value);
-            if (isPomodoroWorking) {
-                alert(`${work}分間の集中タイム終了！お疲れ様です！${rest}分間の休憩に入りましょう。🍅`);
-                isPomodoroWorking = false;
-                document.getElementById('timerDisplay').innerText =
-                    `${String(rest).padStart(2, '0')}:00`;
-            } else {
-                alert(`${rest}分間の休憩タイム終了！次の${work}分間、集中していきましょう！🔥`);
-                isPomodoroWorking = true;
-                document.getElementById('timerDisplay').innerText =
-                    `${String(work).padStart(2, '0')}:00`;
-            }
-            document.getElementById('startBtn').disabled = false;
-            document.getElementById('stopBtn').disabled = true;
-            document.getElementById('subjectSelect').disabled = false;
-        }
+          // 🍅 時間がゼロになったら自動で次のフェーズへ
+function handlePomodoroEnd() {
+
+    clearInterval(timerIdx);
+
+    const work = Number(document.getElementById('workMinutes').value);
+    const rest = Number(document.getElementById('breakMinutes').value);
+
+    if (isPomodoroWorking) {
+
+        alert(`${work}分間の集中タイム終了！☕ ${rest}分休憩します！`);
+
+        isPomodoroWorking = false;
+
+    } else {
+
+        alert(`${rest}分間の休憩終了！🔥 次は${work}分集中です！`);
+
+        isPomodoroWorking = true;
+
+    }
+
+    // 次のフェーズ開始
+    startTime = Date.now();
+
+    timerIdx = setInterval(updatePomodoroDisplay, 1000);
+}
 
 </script>
 </body>
