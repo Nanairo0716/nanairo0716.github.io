@@ -150,9 +150,11 @@
             const remainingMs = targetMs - elapsedMs;
 
             if (remainingMs <= 0) {
-    handlePomodoroEnd(); // 👈 ここを書き換えるだけ！
-    return;
-}
+                // 時間ぴったりで止める（ループ処理は次のステップ5で実装）
+                clearInterval(timerIdx);
+                document.getElementById('timerDisplay').innerText = isPomodoroWorking ? "00:00" : "05:00";
+                return;
+            }
 
             const totalSecs = Math.floor(remainingMs / 1000);
             const mins = Math.floor(totalSecs / 60).toString().padStart(2, '0');
@@ -174,50 +176,19 @@
             document.getElementById('subjectSelect').disabled = true;
         }
 
-            function stopTimer() {
-            clearInterval(timerIdx);
-            
-            // 通常モード時のみ、これまでの記録ロジックを実行
-            if (currentMode === 'normal') {
-                const totalMs = Date.now() - startTime + elapsedTime;
-                const mins = Math.floor(totalMs / 1000 / 60);
-                if (mins >= 1) {
-                    const subject = document.getElementById('subjectSelect').value;
-                    const today = new Date().toLocaleDateString('ja-JP');
-                    logs.unshift({ date: today, subject: subject, minutes: mins });
-                    localStorage.setItem('study_logs', JSON.stringify(logs));
-                } else {
-                    alert("1分未満の勉強時間は記録されません。ここからが本番です！");
-                }
-            } else {
-                // ポモドーロ時は手動ストップで「25分」にリセット
-                document.getElementById('timerDisplay').innerText = isPomodoroWorking ? "25:00" : "05:00";
-            }
+    function stopTimer() {
+        clearInterval(timerIdx);
+        const totalMs = Date.now() - startTime + elapsedTime;
+        const mins = Math.floor(totalMs / 1000 / 60);
 
-            elapsedTime = 0;
-            document.getElementById('startBtn').disabled = false;
-            document.getElementById('stopBtn').disabled = true;
-            document.getElementById('subjectSelect').disabled = false;
-            render();
+        if (mins >= 1) {
+            const subject = document.getElementById('subjectSelect').value;
+            const today = new Date().toLocaleDateString('ja-JP');
+            logs.unshift({ date: today, subject: subject, minutes: mins });
+            localStorage.setItem('study_logs', JSON.stringify(logs));
+        } else {
+            alert("1分未満の勉強時間は記録されません。ここからが本番です！");
         }
-
-        // 🍅 時間がゼロになったときに集中と休憩をループさせる処理
-        function handlePomodoroEnd() {
-            clearInterval(timerIdx);
-            if (isPomodoroWorking) {
-                alert("25分間の集中タイム終了！お疲れ様です！5分間の休憩に入りましょう。🍅");
-                isPomodoroWorking = false;
-                document.getElementById('timerDisplay').innerText = "05:00";
-            } else {
-                alert("5分間の休憩タイム終了！次の25分間、集中していきましょう！🔥");
-                isPomodoroWorking = true;
-                document.getElementById('timerDisplay').innerText = "25:00";
-            }
-            document.getElementById('startBtn').disabled = false;
-            document.getElementById('stopBtn').disabled = true;
-            document.getElementById('subjectSelect').disabled = false;
-        }
-
 
         elapsedTime = 0;
         document.getElementById('timerDisplay').innerText = "00:00:00";
