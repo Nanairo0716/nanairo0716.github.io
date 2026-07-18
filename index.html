@@ -47,6 +47,16 @@
             <option value="社会">社会 🗺️</option>
             <option value="その他">その他 ✏️</option>
         </select>
+        <!-- 🍅 【新機能】ポモドーロ切り替えスイッチ -->
+            <div style="margin-bottom: 20px; display: flex; justify-content: center; gap: 20px; font-weight: bold;">
+                <label style="cursor: pointer;">
+                    <input type="radio" name="timerMode" value="normal" checked onchange="switchMode('normal')" style="transform: scale(1.1); margin-right: 5px;">通常
+                </label>
+                <label style="cursor: pointer; color: #e81123;">
+                    <input type="radio" name="timerMode" value="pomodoro" onchange="switchMode('pomodoro')" style="transform: scale(1.1); margin-right: 5px;">ポモドーロ 🍅
+                </label>
+            </div>
+
         <div class="timer-display" id="timerDisplay">00:00:00</div>
         <button class="btn-start" id="startBtn" onclick="startTimer()">計測開始</button>
         <button class="btn-stop" id="stopBtn" onclick="stopTimer()" disabled>ストップ & 記録</button>
@@ -103,6 +113,22 @@
     let elapsedTime = 0;
     let logs = JSON.parse(localStorage.getItem('study_logs')) || [];
     let todos = JSON.parse(localStorage.getItem('study_todos')) || [];
+// 🍅 ポモドーロモード用の状態管理変数
+    let currentMode = 'normal'; // 'normal' または 'pomodoro'
+    let isPomodoroWorking = true; // true: 25分集中、false: 5分休憩
+    let pomodoroTimerIdx = null;
+// 🍅 通常モードとポモドーロモードを切り替える関数
+    function switchMode(mode) {
+        currentMode = mode;
+        if (timerIdx) clearInterval(timerIdx); // 動いているタイマーを一度止める
+        elapsedTime = 0;
+        if (mode === 'pomodoro') {
+            isPomodoroWorking = true;
+            document.getElementById('timerDisplay').innerText = "25:00"; // 25分スタート
+        } else {
+            document.getElementById('timerDisplay').innerText = "00:00:00";
+        }
+    }
 
     const colors = { '英語': '#0078d4', '数学': '#e81123', '国語': '#ff8c00', '理科': '#107c41', '社会': '#8660a9', 'その他': '#797775' };
 
@@ -114,14 +140,41 @@
         const secs = (totalSecs % 60).toString().padStart(2, '0');
         document.getElementById('timerDisplay').innerText = `${hrs}:${mins}:${secs}`;
     }
+        // 🍅 ポモドーロモード専用のカウントダウン表示関数
+        function updatePomodoroDisplay() {
+            const workMs = 25 * 60 * 1000; // 25分
+            const breakMs = 5 * 60 * 1000; // 5分
+            const targetMs = isPomodoroWorking ? workMs : breakMs;
+            
+            const elapsedMs = Date.now() - startTime;
+            const remainingMs = targetMs - elapsedMs;
 
-    function startTimer() {
-        startTime = Date.now();
-        timerIdx = setInterval(updateTimerDisplay, 1000);
-        document.getElementById('startBtn').disabled = true;
-        document.getElementById('stopBtn').disabled = false;
-        document.getElementById('subjectSelect').disabled = true;
-    }
+            if (remainingMs <= 0) {
+                // 時間ぴったりで止める（ループ処理は次のステップ5で実装）
+                clearInterval(timerIdx);
+                document.getElementById('timerDisplay').innerText = isPomodoroWorking ? "00:00" : "05:00";
+                return;
+            }
+
+            const totalSecs = Math.floor(remainingMs / 1000);
+            const mins = Math.floor(totalSecs / 60).toString().padStart(2, '0');
+            const secs = (totalSecs % 60).toString().padStart(2, '0');
+            document.getElementById('timerDisplay').innerText = `${mins}:${secs}`;
+        }
+
+           function startTimer() {
+            startTime = Date.now();
+            if (currentMode === 'pomodoro') {
+                // ポモドーロモード時は専用のカウントダウン関数を1秒ごとに実行
+                timerIdx = setInterval(updatePomodoroDisplay, 1000);
+            } else {
+                // 通常モード時はこれまでのタイマーを実行
+                timerIdx = setInterval(updateTimerDisplay, 1000);
+            }
+            document.getElementById('startBtn').disabled = true;
+            document.getElementById('stopBtn').disabled = false;
+            document.getElementById('subjectSelect').disabled = true;
+        }
 
     function stopTimer() {
         clearInterval(timerIdx);
