@@ -373,14 +373,19 @@ renderTodos();
             // 🍅 時間がゼロになったときに集中と休憩をループさせる関数
         function handlePomodoroEnd() {
             clearInterval(timerIdx);
+            
+            const work = Number(document.getElementById('workMinutes').value);
+            const rest = Number(document.getElementById('breakMinutes').value);
             if (isPomodoroWorking) {
-                alert("25分間の集中タイム終了！お疲れ様です！5分間の休憩に入りましょう。🍅");
+                alert(`${work}分間の集中タイム終了！お疲れ様です！${rest}分間の休憩に入りましょう。🍅`);
                 isPomodoroWorking = false;
-                document.getElementById('timerDisplay').innerText = "05:00";
+                document.getElementById('timerDisplay').innerText =
+                    `${String(rest).padStart(2, '0')}:00`;
             } else {
-                alert("5分間の休憩タイム終了！次の25分間、集中していきましょう！🔥");
+                alert(`${rest}分間の休憩タイム終了！次の${work}分間、集中していきましょう！🔥`);
                 isPomodoroWorking = true;
-                document.getElementById('timerDisplay').innerText = "25:00";
+                document.getElementById('timerDisplay').innerText =
+                    `${String(work).padStart(2, '0')}:00`;
             }
             document.getElementById('startBtn').disabled = false;
             document.getElementById('stopBtn').disabled = true;
