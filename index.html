@@ -206,8 +206,8 @@ function switchMode(mode) {
     }
         // 🍅 ポモドーロモード専用のカウントダウン表示関数
         function updatePomodoroDisplay() {
-            const workMs = 25 * 60 * 1000; // 25分
-            const breakMs = 5 * 60 * 1000; // 5分
+            const workMs = Number(document.getElementById('workMinutes').value) * 60 * 1000;
+            const breakMs = Number(document.getElementById('breakMinutes').value) * 60 * 1000;
             const targetMs = isPomodoroWorking ? workMs : breakMs;
             
             const elapsedMs = Date.now() - startTime;
