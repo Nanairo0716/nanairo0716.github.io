@@ -176,17 +176,23 @@
     let isPomodoroWorking = true; // true: 25分集中、false: 5分休憩
     let pomodoroTimerIdx = null;
 // 🍅 通常モードとポモドーロモードを切り替える関数
-    function switchMode(mode) {
-        currentMode = mode;
-        if (timerIdx) clearInterval(timerIdx); // 動いているタイマーを一度止める
-        elapsedTime = 0;
-        if (mode === 'pomodoro') {
-            isPomodoroWorking = true;
-            document.getElementById('timerDisplay').innerText = "25:00"; // 25分スタート
-        } else {
-            document.getElementById('timerDisplay').innerText = "00:00:00";
-        }
+function switchMode(mode) {
+    currentMode = mode;
+
+    // ★ ポモドーロ設定の表示・非表示
+    const settings = document.getElementById('pomodoroSettings');
+    settings.style.display = (mode === 'pomodoro') ? 'block' : 'none';
+
+    if (timerIdx) clearInterval(timerIdx);
+    elapsedTime = 0;
+
+    if (mode === 'pomodoro') {
+        isPomodoroWorking = true;
+        document.getElementById('timerDisplay').innerText = "25:00";
+    } else {
+        document.getElementById('timerDisplay').innerText = "00:00:00";
     }
+}
 
     const colors = { '英語': '#0078d4', '数学': '#e81123', '国語': '#ff8c00', '理科': '#107c41', '社会': '#8660a9', 'その他': '#797775' };
 
