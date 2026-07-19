@@ -300,16 +300,6 @@ function stopTimer() {
 
     render();
 }
-
-    elapsedTime = 0;
-
-    document.getElementById('startBtn').disabled = false;
-    document.getElementById('stopBtn').disabled = true;
-    document.getElementById('subjectSelect').disabled = false;
-
-    render();
-}
-
                 localStorage.setItem('study_logs', JSON.stringify(logs));
             }
 
