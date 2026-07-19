@@ -252,9 +252,27 @@ function switchMode(mode) {
                 } else {
                     alert("1分未満の勉強時間は記録されません。ここからが本番です！");
                 }
-            } else {
-                document.getElementById('timerDisplay').innerText = isPomodoroWorking ? "25:00" : "05:00";
-            }
+} else {
+
+    if (pomodoroStudyMinutes >= 1) {
+
+        const subject = document.getElementById('subjectSelect').value;
+        const today = new Date().toLocaleDateString('ja-JP');
+
+        logs.unshift({
+            date: today,
+            subject: subject,
+            minutes: pomodoroStudyMinutes
+        });
+
+        localStorage.setItem('study_logs', JSON.stringify(logs));
+
+        pomodoroStudyMinutes = 0;
+    }
+
+    document.getElementById('timerDisplay').innerText =
+        isPomodoroWorking ? "25:00" : "05:00";
+}
 
             elapsedTime = 0;
             document.getElementById('startBtn').disabled = false;
