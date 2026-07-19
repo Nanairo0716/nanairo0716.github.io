@@ -291,28 +291,11 @@ function stopTimer() {
         // ポモドーロの貯金をリセット
         pomodoroStudyMinutes = 0;
     }
-
-    elapsedTime = 0;
-
-    document.getElementById('startBtn').disabled = false;
-    document.getElementById('stopBtn').disabled = true;
-    document.getElementById('subjectSelect').disabled = false;
-
     render();
 }
-                localStorage.setItem('study_logs', JSON.stringify(logs));
-            }
 
-                // 貯金箱を空にする
-                pomodoroStudyMinutes = 0;
+function render() {
             }
-
-            elapsedTime = 0;
-            document.getElementById('startBtn').disabled = false;
-            document.getElementById('stopBtn').disabled = true;
-            document.getElementById('subjectSelect').disabled = false;
-            render();
-        }
 
     function render() {
         const todayStr = new Date().toLocaleDateString('ja-JP');
@@ -333,7 +316,7 @@ function stopTimer() {
         document.getElementById('todayTotal').innerText = formatMinutesToHoursAndMinutes(todayMins);
         document.getElementById('allTotal').innerText = formatMinutesToHoursAndMinutes(totalMins);
 
-        let maxMinutes = Math.max(...Object.values(subjectTotals), 1);
+        let maxMinutes = Math.max(Object.values(subjectTotals), 1);
         let graphHtml = '';
         Object.keys(subjectTotals).forEach(sub => {
             const mins = subjectTotals[sub];
