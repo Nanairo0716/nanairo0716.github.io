@@ -238,64 +238,52 @@ function switchMode(mode) {
         }
 
 
-function stopTimer() {
-    clearInterval(timerIdx);
+            function stopTimer() {
+            clearInterval(timerIdx);
+            
+            if (currentMode === 'normal') {
+                const totalMs = Date.now() - startTime + elapsedTime;
+                const mins = Math.floor(totalMs / 1000 / 60);
+                if (mins >= 1) {
+                    const subject = document.getElementById('subjectSelect').value;
+                    const today = new Date().toLocaleDateString('ja-JP');
+                    logs.unshift({ date: today, subject: subject, minutes: mins });
+                    localStorage.setItem('study_logs', JSON.stringify(logs));
+                } else {
+                    alert("1分未満の勉強時間は記録されません。ここからが本番です！");
+                } else {
+                
+                let totalMinutes = pomodoroStudyMinutes;
+                
+                // 集中中なら、途中までの時間も加算
+                if (isPomodoroWorking) {
+                    const currentMinutes = Math.floor((Date.now() - startTime) / 1000 / 60);
+                    totalMinutes += currentMinutes;
+                }
 
-    if (currentMode === 'normal') {
+                if (totalMinutes >= 1) 
+                    const subject = document.getElementById('subjectSelect').value;
+                const today = new Date().toLocaleDateString('ja-JP');
 
-        const totalMs = Date.now() - startTime + elapsedTime;
-        const mins = Math.floor(totalMs / 1000 / 60);
+                logs.unshift({
+                    date: today,
+                    subject: subject,
+                    minutes: totalMinutes
+                });
 
-        if (mins >= 1) {
-            const subject = document.getElementById('subjectSelect').value;
-            const today = new Date().toLocaleDateString('ja-JP');
-
-            logs.unshift({
-                date: today,
-                subject: subject,
-                minutes: mins
-            });
-
-            localStorage.setItem('study_logs', JSON.stringify(logs));
-
-        } else {
-            alert("1分未満の勉強時間は記録されません。ここからが本番です！");
-        }
-
-    } else {
-
-        let totalMinutes = pomodoroStudyMinutes;
-
-        // 集中中なら途中までの時間も加算
-        if (isPomodoroWorking) {
-            const currentMinutes = Math.floor((Date.now() - startTime) / 1000 / 60);
-            totalMinutes += currentMinutes;
-        }
-
-        if (totalMinutes >= 1) {
-            const subject = document.getElementById('subjectSelect').value;
-            const today = new Date().toLocaleDateString('ja-JP');
-
-            logs.unshift({
-                date: today,
-                subject: subject,
-                minutes: totalMinutes
-            });
-
-            localStorage.setItem('study_logs', JSON.stringify(logs));
-
-        } else {
-            alert("1分未満の勉強時間は記録されません！");
-        }
-
-        // ポモドーロの貯金をリセット
-        pomodoroStudyMinutes = 0;
-    }
-    render();
-}
-
-function render() {
+                localStorage.setItem('study_logs', JSON.stringify(logs));
             }
+
+                // 貯金箱を空にする
+                pomodoroStudyMinutes = 0;
+            }
+
+            elapsedTime = 0;
+            document.getElementById('startBtn').disabled = false;
+            document.getElementById('stopBtn').disabled = true;
+            document.getElementById('subjectSelect').disabled = false;
+            render();
+        }
 
     function render() {
         const todayStr = new Date().toLocaleDateString('ja-JP');
@@ -316,7 +304,7 @@ function render() {
         document.getElementById('todayTotal').innerText = formatMinutesToHoursAndMinutes(todayMins);
         document.getElementById('allTotal').innerText = formatMinutesToHoursAndMinutes(totalMins);
 
-        let maxMinutes = Math.max(Object.values(subjectTotals), 1);
+        let maxMinutes = Math.max(...Object.values(subjectTotals), 1);
         let graphHtml = '';
         Object.keys(subjectTotals).forEach(sub => {
             const mins = subjectTotals[sub];
