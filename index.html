@@ -171,6 +171,7 @@
     let elapsedTime = 0;
     let logs = JSON.parse(localStorage.getItem('study_logs')) || [];
     let todos = JSON.parse(localStorage.getItem('study_todos')) || [];
+    let pomodoroStudyMinutes = 0; // ポモドーロで貯まった集中時間
 // 🍅 ポモドーロモード用の状態管理変数
     let currentMode = 'normal'; // 'normal' または 'pomodoro'
     let isPomodoroWorking = true; // true: 25分集中、false: 5分休憩
@@ -379,9 +380,10 @@ function handlePomodoroEnd() {
     const rest = Number(document.getElementById('breakMinutes').value);
 
     if (isPomodoroWorking) {
-
+        pomodoroStudyMinutes += work;
+        
         alert(`${work}分間の集中タイム終了！☕ ${rest}分休憩します！`);
-
+        
         isPomodoroWorking = false;
 
     } else {
