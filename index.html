@@ -176,6 +176,7 @@
     let currentMode = 'normal'; // 'normal' または 'pomodoro'
     let isPomodoroWorking = true; // true: 25分集中、false: 5分休憩
     let pomodoroTimerIdx = null;
+    let currentSessionStart = 0; // 今の集中タイム開始時刻
 // 🍅 通常モードとポモドーロモードを切り替える関数
 function switchMode(mode) {
     currentMode = mode;
@@ -229,6 +230,7 @@ function switchMode(mode) {
             startTime = Date.now();
             if (currentMode === 'pomodoro') {
                 timerIdx = setInterval(updatePomodoroDisplay, 1000);
+                currentSessionStart = Date.now();
             } else {
                 timerIdx = setInterval(updateTimerDisplay, 1000);
             }
@@ -254,7 +256,14 @@ function switchMode(mode) {
                 }
 } else {
 
-    if (pomodoroStudyMinutes >= 1) {
+    const currentMinutes =
+    isPomodoroWorking
+        ? Math.floor((Date.now() - currentSessionStart) / 60000)
+        : 0;
+
+const totalMinutes = pomodoroStudyMinutes + currentMinutes;
+
+if (totalMinutes >= 1) {
 
         const subject = document.getElementById('subjectSelect').value;
         const today = new Date().toLocaleDateString('ja-JP');
@@ -262,12 +271,13 @@ function switchMode(mode) {
         logs.unshift({
             date: today,
             subject: subject,
-            minutes: pomodoroStudyMinutes
+            minutes: totalMinutes
         });
 
         localStorage.setItem('study_logs', JSON.stringify(logs));
 
         pomodoroStudyMinutes = 0;
+        currentSessionStart = 0;
     }
 
     document.getElementById('timerDisplay').innerText =
@@ -399,6 +409,7 @@ function handlePomodoroEnd() {
 
     if (isPomodoroWorking) {
         pomodoroStudyMinutes += work;
+        currentSessionStart = Date.now();
         
         alert(`${work}分間の集中タイム終了！☕ ${rest}分休憩します！`);
         
