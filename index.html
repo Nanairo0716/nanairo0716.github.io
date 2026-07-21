@@ -75,7 +75,9 @@
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
         <span>🍅 集中時間</span>
         <div>
-            <input id="workMinutes"
+            <input
+    id="workMinutes"
+    oninput="updatePomodoroPreview()"
                    type="number"
                    min="1"
                    max="180"
@@ -93,7 +95,9 @@
     <div style="display:flex; justify-content:space-between; align-items:center;">
         <span>☕ 休憩時間</span>
         <div>
-            <input id="breakMinutes"
+            <input
+    id="breakMinutes"
+    oninput="updatePomodoroPreview()"
                    type="number"
                    min="1"
                    max="60"
@@ -429,6 +433,17 @@ function handlePomodoroEnd() {
     timerIdx = setInterval(updatePomodoroDisplay, 1000);
 }
 
+    function updatePomodoroPreview() {
+
+    if (currentMode !== 'pomodoro') return;
+
+    const mins = isPomodoroWorking
+        ? Number(document.getElementById('workMinutes').value)
+        : Number(document.getElementById('breakMinutes').value);
+
+    document.getElementById('timerDisplay').innerText =
+        `${String(mins).padStart(2,'0')}:00`;
+}
 </script>
 </body>
 </html>
