@@ -175,6 +175,16 @@
 </div>
 
 <script>
+    //====================
+    // 定数
+    //====================
+    const MS_PER_SECOND = 1000;
+    const SECONDS_PER_MINUTE = 60;
+    const MS_PER_MINUTE = MS_PER_SECOND * SECONDS_PER_MINUTE;
+
+    const DEFAULT_WORK_MINUTES = 25;
+    const DEFAULT_BREAK_MINUTES = 5;
+    
     let timerIdx = null;
     let startTime = 0;
     let elapsedTime = 0;
@@ -209,7 +219,7 @@ function switchMode(mode) {
 
     function updateTimerDisplay() {
         const totalMs = Date.now() - startTime + elapsedTime;
-        const totalSecs = Math.floor(totalMs / 1000);
+        const totalSecs = Math.floor(totalMs / MS_PER_SECOND);
         const hrs = Math.floor(totalSecs / 3600).toString().padStart(2, '0');
         const mins = Math.floor((totalSecs % 3600) / 60).toString().padStart(2, '0');
         const secs = (totalSecs % 60).toString().padStart(2, '0');
@@ -217,8 +227,8 @@ function switchMode(mode) {
     }
         // 🍅 ポモドーロモード専用のカウントダウン表示関数
         function updatePomodoroDisplay() {
-            const workMs = Number(document.getElementById('workMinutes').value) * 60 * 1000;
-            const breakMs = Number(document.getElementById('breakMinutes').value) * 60 * 1000;
+            const workMs = Number(document.getElementById('workMinutes').value) * MS_PER_MINUTE;
+            const breakMs = Number(document.getElementById('breakMinutes').value) * MS_PER_MINUTE;
             const targetMs = isPomodoroWorking ? workMs : breakMs;
             
             const elapsedMs = Date.now() - startTime;
@@ -229,7 +239,7 @@ function switchMode(mode) {
     return;
 }
 
-            const totalSecs = Math.floor(remainingMs / 1000);
+            const totalSecs = Math.floor(remainingMs / MS_PER_SECOND);
             const mins = Math.floor(totalSecs / 60).toString().padStart(2, '0');
             const secs = (totalSecs % 60).toString().padStart(2, '0');
             document.getElementById('timerDisplay').innerText = `${mins}:${secs}`;
@@ -251,10 +261,10 @@ function savePomodoroSettings() {
             if (currentMode === 'pomodoro') {
                 lockPomodoroSettings();
                 
-                timerIdx = setInterval(updatePomodoroDisplay, 1000);
+                timerIdx = setInterval(updatePomodoroDisplay, MS_PER_SECOND);
                 currentSessionStart = Date.now();
             } else {
-                timerIdx = setInterval(updateTimerDisplay, 1000);
+                timerIdx = setInterval(updateTimerDisplay, MS_PER_SECOND);
             }
             document.getElementById('startBtn').disabled = true;
             document.getElementById('stopBtn').disabled = false;
@@ -268,7 +278,7 @@ function savePomodoroSettings() {
             if (currentMode === 'normal') {
                 
                 const totalMs = Date.now() - startTime + elapsedTime;
-                const mins = Math.floor(totalMs / 1000 / 60);
+                const mins = Math.floor(totalMs / MS_PER_MINUTE);
                 if (mins >= 1) {
                     const subject = document.getElementById('subjectSelect').value;
                     const today = new Date().toLocaleDateString('ja-JP');
@@ -281,7 +291,7 @@ function savePomodoroSettings() {
 
     const currentMinutes =
     isPomodoroWorking
-        ? Math.floor((Date.now() - currentSessionStart) / 60000)
+        ? Math.floor((Date.now() - currentSessionStart) / MS_PER_MINUTE)
         : 0;
 
 const totalMinutes = pomodoroStudyMinutes + currentMinutes;
@@ -487,7 +497,7 @@ function handlePomodoroEnd() {
     // 次のフェーズ開始
     startTime = Date.now();
 
-    timerIdx = setInterval(updatePomodoroDisplay, 1000);
+    timerIdx = setInterval(updatePomodoroDisplay, MS_PER_SECOND);
 }
 
     function updatePomodoroPreview() {
