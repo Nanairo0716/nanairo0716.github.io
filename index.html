@@ -75,9 +75,8 @@
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
         <span>🍅 集中時間</span>
         <div>
-            <input
-    id="workMinutes"
-    oninput="updatePomodoroPreview()"
+            <input id="workMinutes"
+       oninput="updatePomodoroPreview(); savePomodoroSettings()"
                    type="number"
                    min="1"
                    max="180"
@@ -95,9 +94,8 @@
     <div style="display:flex; justify-content:space-between; align-items:center;">
         <span>☕ 休憩時間</span>
         <div>
-            <input
-    id="breakMinutes"
-    oninput="updatePomodoroPreview()"
+            <input id="breakMinutes"
+       oninput="updatePomodoroPreview(); savePomodoroSettings()"
                    type="number"
                    min="1"
                    max="60"
@@ -229,6 +227,17 @@ function switchMode(mode) {
             const secs = (totalSecs % 60).toString().padStart(2, '0');
             document.getElementById('timerDisplay').innerText = `${mins}:${secs}`;
         }
+
+    // 💾 ポモドーロ設定を保存
+function savePomodoroSettings() {
+    localStorage.setItem(
+        'pomodoro_settings',
+        JSON.stringify({
+            work: document.getElementById('workMinutes').value,
+            rest: document.getElementById('breakMinutes').value
+        })
+    );
+}
 
                    function startTimer() {
             startTime = Date.now();
@@ -398,6 +407,16 @@ function deleteTodo(index) {
 document.getElementById('todoInput').addEventListener('keypress', (e) => {
     if (e.key === 'Enter') addTodo();
 });
+
+    // 💾 保存されているポモドーロ設定を読み込む
+const savedPomodoro = JSON.parse(
+    localStorage.getItem('pomodoro_settings')
+);
+
+if (savedPomodoro) {
+    document.getElementById('workMinutes').value = savedPomodoro.work;
+    document.getElementById('breakMinutes').value = savedPomodoro.rest;
+}
 
 // 初回読み込み時にTo Doリストを描画
 renderTodos();
