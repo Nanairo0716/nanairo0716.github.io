@@ -199,7 +199,7 @@ function switchMode(mode) {
 
     if (mode === 'pomodoro') {
         isPomodoroWorking = true;
-        document.getElementById('timerDisplay').innerText = "25:00";
+        updatePomodoroPreview();   // ← 保存されている集中時間を表示
     } else {
         document.getElementById('timerDisplay').innerText = "00:00:00";
     }
@@ -305,9 +305,8 @@ if (totalMinutes >= 1) {
     currentSessionStart = 0;
 }
 
-                document.getElementById('timerDisplay').innerText =
-                    isPomodoroWorking ? "25:00" : "05:00";
-}
+                updatePomodoroPreview();
+            }
  
                 elapsedTime = 0;
                 document.getElementById('startBtn').disabled = false;
