@@ -29,6 +29,13 @@
         .history-table th, .history-table td { border: 1px solid #ddd; padding: 10px; text-align: center; }
         .history-table th { background-color: #f3f2f1; }
         .btn-clear { background: #797775; color: white; font-size: 12px; padding: 5px 10px; float: right; }
+        /* 🍅 ポモドーロ設定ロック中 */
+        #pomodoroSettings input:disabled{
+            background:#eeeeee;    
+            color:#777;
+            cursor:not-allowed;   
+            opacity:0.8;
+        }
     </style>
 </head>
 <body>
@@ -242,6 +249,9 @@ function savePomodoroSettings() {
                    function startTimer() {
             startTime = Date.now();
             if (currentMode === 'pomodoro') {
+                document.getElementById('workMinutes').disabled = true;
+                document.getElementById('breakMinutes').disabled = true;
+                
                 timerIdx = setInterval(updatePomodoroDisplay, 1000);
                 currentSessionStart = Date.now();
             } else {
@@ -257,6 +267,7 @@ function savePomodoroSettings() {
             clearInterval(timerIdx);
             
             if (currentMode === 'normal') {
+                
                 const totalMs = Date.now() - startTime + elapsedTime;
                 const mins = Math.floor(totalMs / 1000 / 60);
                 if (mins >= 1) {
@@ -278,29 +289,35 @@ const totalMinutes = pomodoroStudyMinutes + currentMinutes;
 
 if (totalMinutes >= 1) {
 
-        const subject = document.getElementById('subjectSelect').value;
-        const today = new Date().toLocaleDateString('ja-JP');
+        
+    const subject = document.getElementById('subjectSelect').value;     
+    const today = new Date().toLocaleDateString('ja-JP');
+    
+    logs.unshift({
+        date: today,
+        subject: subject,
+        minutes: totalMinutes  
+    });
+    
+    localStorage.setItem('study_logs', JSON.stringify(logs));
 
-        logs.unshift({
-            date: today,
-            subject: subject,
-            minutes: totalMinutes
-        });
-
-        localStorage.setItem('study_logs', JSON.stringify(logs));
-
-        pomodoroStudyMinutes = 0;
-        currentSessionStart = 0;
-    }
-
-    document.getElementById('timerDisplay').innerText =
-        isPomodoroWorking ? "25:00" : "05:00";
+    pomodoroStudyMinutes = 0;
+    currentSessionStart = 0;
 }
 
-            elapsedTime = 0;
-            document.getElementById('startBtn').disabled = false;
-            document.getElementById('stopBtn').disabled = true;
-            document.getElementById('subjectSelect').disabled = false;
+                document.getElementById('timerDisplay').innerText =
+                    isPomodoroWorking ? "25:00" : "05:00";
+}
+ 
+                elapsedTime = 0;
+                document.getElementById('startBtn').disabled = false;
+                document.getElementById('stopBtn').disabled = true;
+                document.getElementById('subjectSelect').disabled = false;
+
+                // 🍅 ポモドーロ設定のロック解除
+                document.getElementById('workMinutes').disabled = false;
+                document.getElementById('breakMinutes').disabled = false;
+                
             render();
         }
 
