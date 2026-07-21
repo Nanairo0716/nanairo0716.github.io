@@ -249,8 +249,7 @@ function savePomodoroSettings() {
                    function startTimer() {
             startTime = Date.now();
             if (currentMode === 'pomodoro') {
-                document.getElementById('workMinutes').disabled = true;
-                document.getElementById('breakMinutes').disabled = true;
+                lockPomodoroSettings();
                 
                 timerIdx = setInterval(updatePomodoroDisplay, 1000);
                 currentSessionStart = Date.now();
@@ -309,16 +308,39 @@ if (totalMinutes >= 1) {
             }
  
                 elapsedTime = 0;
-                document.getElementById('startBtn').disabled = false;
-                document.getElementById('stopBtn').disabled = true;
-                document.getElementById('subjectSelect').disabled = false;
 
-                // 🍅 ポモドーロ設定のロック解除
-                document.getElementById('workMinutes').disabled = false;
-                document.getElementById('breakMinutes').disabled = false;
-                
-            render();
+                unlockTimerUI();
+
+                render();
         }
+
+//====================
+// タイマーUIを通常状態に戻す
+//====================
+function unlockTimerUI() {
+    document.getElementById('startBtn').disabled = false;
+    document.getElementById('stopBtn').disabled = true;
+    document.getElementById('subjectSelect').disabled = false;
+
+    // 🍅 ポモドーロ設定
+    unlockPomodoroSettings();
+}
+
+//====================
+// ポモドーロ設定をロック
+//====================
+function lockPomodoroSettings() {
+    document.getElementById('workMinutes').disabled = true;
+    document.getElementById('breakMinutes').disabled = true;
+}
+
+//====================
+// ポモドーロ設定のロック解除
+//====================
+function unlockPomodoroSettings() {
+    document.getElementById('workMinutes').disabled = false;
+    document.getElementById('breakMinutes').disabled = false;
+}    
 
     function render() {
         const todayStr = new Date().toLocaleDateString('ja-JP');
