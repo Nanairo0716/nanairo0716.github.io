@@ -1,18 +1,54 @@
-        //====================
-        // 定数
-        //====================
-        const MS_PER_SECOND = 1000;
-        const SECONDS_PER_MINUTE = 60;
-        const MS_PER_MINUTE = MS_PER_SECOND * SECONDS_PER_MINUTE;
+//====================
+// DOM要素
+//====================
 
-        const DEFAULT_WORK_MINUTES = 25;
-        const DEFAULT_BREAK_MINUTES = 5;
+const timerDisplay = document.getElementById('timerDisplay');
+const startBtn = document.getElementById('startBtn');
+const stopBtn = document.getElementById('stopBtn');
+const subjectSelect = document.getElementById('subjectSelect');
+
+const workMinutesInput = document.getElementById("workMinutes");
+const breakMinutesInput = document.getElementById("breakMinutes");
+
+const pomodoroSettings =
+    document.getElementById("pomodoroSettings");
+
+const todoInput =
+    document.getElementById("todoInput");
+ 
+//====================
+// 定数
+//====================
+
+const MS_PER_SECOND = 1000;
+const SECONDS_PER_MINUTE = 60;
+const MS_PER_MINUTE = MS_PER_SECOND * SECONDS_PER_MINUTE;
+
+const DEFAULT_WORK_MINUTES = 25;
+const DEFAULT_BREAK_MINUTES = 5;
+
+// localStorageキー
+const STORAGE_KEYS = {
+    LOGS: 'study_logs',
+    TODOS: 'study_todos',
+    POMODORO: 'pomodoro_settings'
+};
+
+// 教科カラー
+const SUBJECT_COLORS = {
+    '英語': '#0078d4',
+    '数学': '#e81123',
+    '国語': '#ff8c00',
+    '理科': '#107c41',
+    '社会': '#8660a9',
+    'その他': '#797775'
+};
 
         let timerIdx = null;
         let startTime = 0;
         let elapsedTime = 0;
-        let logs = JSON.parse(localStorage.getItem('study_logs')) || [];
-        let todos = JSON.parse(localStorage.getItem('study_todos')) || [];
+        let logs = JSON.parse(localStorage.getItem(STORAGE_KEYS.LOGS)) || [];
+        let todos = JSON.parse(localStorage.getItem(STORAGE_KEYS.TODOS)) || [];
         let pomodoroStudyMinutes = 0; // ポモドーロで貯まった集中時間
         // 🍅 ポモドーロモード用の状態管理変数
         let currentMode = 'normal'; // 'normal' または 'pomodoro'
@@ -24,7 +60,7 @@
             currentMode = mode;
 
             // ★ ポモドーロ設定の表示・非表示
-            const settings = document.getElementById('pomodoroSettings');
+            const settings = pomodoroSettings;
             settings.style.display = (mode === 'pomodoro') ? 'block' : 'none';
 
             if (timerIdx) clearInterval(timerIdx);
@@ -34,24 +70,14 @@
                 isPomodoroWorking = true;
                 updatePomodoroPreview();   // ← 保存されている集中時間を表示
             } else {
-                document.getElementById('timerDisplay').innerText = "00:00:00";
+                timerDisplay.innerText = "00:00:00";
             }
         }
 
-        const colors = { '英語': '#0078d4', '数学': '#e81123', '国語': '#ff8c00', '理科': '#107c41', '社会': '#8660a9', 'その他': '#797775' };
-
-        function updateTimerDisplay() {
-            const totalMs = Date.now() - startTime + elapsedTime;
-            const totalSecs = Math.floor(totalMs / MS_PER_SECOND);
-            const hrs = Math.floor(totalSecs / 3600).toString().padStart(2, '0');
-            const mins = Math.floor((totalSecs % 3600) / 60).toString().padStart(2, '0');
-            const secs = (totalSecs % 60).toString().padStart(2, '0');
-            document.getElementById('timerDisplay').innerText = `${hrs}:${mins}:${secs}`;
-        }
         // 🍅 ポモドーロモード専用のカウントダウン表示関数
         function updatePomodoroDisplay() {
-            const workMs = Number(document.getElementById('workMinutes').value) * MS_PER_MINUTE;
-            const breakMs = Number(document.getElementById('breakMinutes').value) * MS_PER_MINUTE;
+            const workMs = Number(workMinutesInput.value) * MS_PER_MINUTE;
+            const breakMs = Number(breakMinutesInput.value) * MS_PER_MINUTE;
             const targetMs = isPomodoroWorking ? workMs : breakMs;
 
             const elapsedMs = Date.now() - startTime;
@@ -65,16 +91,16 @@
             const totalSecs = Math.floor(remainingMs / MS_PER_SECOND);
             const mins = Math.floor(totalSecs / 60).toString().padStart(2, '0');
             const secs = (totalSecs % 60).toString().padStart(2, '0');
-            document.getElementById('timerDisplay').innerText = `${mins}:${secs}`;
+            timerDisplay.innerText = `${mins}:${secs}`;
         }
 
         // 💾 ポモドーロ設定を保存
         function savePomodoroSettings() {
             localStorage.setItem(
-                'pomodoro_settings',
+                STORAGE_KEYS.POMODORO,
                 JSON.stringify({
-                    work: document.getElementById('workMinutes').value,
-                    rest: document.getElementById('breakMinutes').value
+                    work: workMinutesInput.value,
+                    rest: breakMinutesInput.value
                 })
             );
         }
@@ -89,9 +115,9 @@
             } else {
                 timerIdx = setInterval(updateTimerDisplay, MS_PER_SECOND);
             }
-            document.getElementById('startBtn').disabled = true;
-            document.getElementById('stopBtn').disabled = false;
-            document.getElementById('subjectSelect').disabled = true;
+            startBtn.disabled = true;
+            stopBtn.disabled = false;
+            subjectSelect.disabled = true;
         }
 
 
@@ -103,10 +129,10 @@
                 const totalMs = Date.now() - startTime + elapsedTime;
                 const mins = Math.floor(totalMs / MS_PER_MINUTE);
                 if (mins >= 1) {
-                    const subject = document.getElementById('subjectSelect').value;
+                    const subject = subjectSelect.value;
                     const today = new Date().toLocaleDateString('ja-JP');
                     logs.unshift({ date: today, subject: subject, minutes: mins });
-                    localStorage.setItem('study_logs', JSON.stringify(logs));
+                    localStorage.setItem(STORAGE_KEYS.LOGS, JSON.stringify(logs));
                 } else {
                     alert("1分未満の勉強時間は記録されません。ここからが本番です！");
                 }
@@ -122,7 +148,7 @@
                 if (totalMinutes >= 1) {
 
 
-                    const subject = document.getElementById('subjectSelect').value;
+                    const subject = subjectSelect.value;
                     const today = new Date().toLocaleDateString('ja-JP');
 
                     logs.unshift({
@@ -131,7 +157,7 @@
                         minutes: totalMinutes
                     });
 
-                    localStorage.setItem('study_logs', JSON.stringify(logs));
+                    localStorage.setItem(STORAGE_KEYS.LOGS, JSON.stringify(logs));
 
                     pomodoroStudyMinutes = 0;
                     currentSessionStart = 0;
@@ -151,9 +177,9 @@
         // タイマーUIを通常状態に戻す
         //====================
         function unlockTimerUI() {
-            document.getElementById('startBtn').disabled = false;
-            document.getElementById('stopBtn').disabled = true;
-            document.getElementById('subjectSelect').disabled = false;
+            startBtn.disabled = false;
+            stopBtn.disabled = true;
+            subjectSelect.disabled = false;
 
             // 🍅 ポモドーロ設定
             unlockPomodoroSettings();
@@ -163,16 +189,16 @@
         // ポモドーロ設定をロック
         //====================
         function lockPomodoroSettings() {
-            document.getElementById('workMinutes').disabled = true;
-            document.getElementById('breakMinutes').disabled = true;
+            workMinutesInput.disabled = true;
+            breakMinutesInput.disabled = true;
         }
 
         //====================
         // ポモドーロ設定のロック解除
         //====================
         function unlockPomodoroSettings() {
-            document.getElementById('workMinutes').disabled = false;
-            document.getElementById('breakMinutes').disabled = false;
+            workMinutesInput.disabled = false;
+            breakMinutesInput.disabled = false;
         }
 
         function render() {
@@ -188,11 +214,11 @@
                 if (subjectTotals[log.subject] !== undefined) subjectTotals[log.subject] += log.minutes;
                 html += `<tr><td>${log.date}</td><td>${log.subject}</td><td>${log.minutes} 分</td></tr>`;
             });
-            document.getElementById('historyBody').innerHTML = html;
+            historyBody.innerHTML = html;
 
             // 【修正点①】デカ文字部分を〇時間〇分表示に変更
-            document.getElementById('todayTotal').innerText = formatMinutesToHoursAndMinutes(todayMins);
-            document.getElementById('allTotal').innerText = formatMinutesToHoursAndMinutes(totalMins);
+            todayTotal.innerText = formatMinutesToHoursAndMinutes(todayMins);
+            allTotal.innerText = formatMinutesToHoursAndMinutes(totalMins);
 
             let maxMinutes = Math.max(...Object.values(subjectTotals), 1);
             let graphHtml = '';
@@ -204,17 +230,17 @@
                 <div class="bar-row">
                     <div class="bar-label">${sub}</div>
                     <div class="bar-outer">
-                        <div class="bar-inner" style="width: ${pct}%; background-color: ${colors[sub] || '#ccc'}"></div>
+                        <div class="bar-inner" style="width: ${pct}%; background-color: ${SUBJECT_COLORS[sub] || '#ccc'}"></div>
                     </div>
                     <div class="bar-time">${formatMinutesToHoursAndMinutes(mins)}</div>
                 </div>`;
             });
-            document.getElementById('graphs').innerHTML = graphHtml;
+            graphs.innerHTML = graphHtml;
         }
 
         function clearData() {
             if (confirm("これまでの全勉強データをリセットしますか？")) {
-                localStorage.removeItem('study_logs');
+                localStorage.removeItem(STORAGE_KEYS.LOGS);
                 logs = [];
                 render();
             }
@@ -236,12 +262,12 @@
 
         // --- To Doリストの追加と画面描画 ---
         function addTodo() {
-            const input = document.getElementById('todoInput');
+            const input = todoInput;
             const text = input.value.trim();
             if (text === '') return;
 
             todos.push({ text: text, completed: false });
-            localStorage.setItem('study_todos', JSON.stringify(todos));
+            localStorage.setItem(STORAGE_KEYS.TODOS, JSON.stringify(todos));
             input.value = '';
             renderTodos();
         }
@@ -260,33 +286,33 @@
                 <button onclick="deleteTodo(${idx})" style="background: none; border: none; color: #ff8c00; cursor: pointer; font-size: 13px; font-weight: bold; padding: 0; margin: 0;">削除</button>
             </li>`;
             });
-            document.getElementById('todoList').innerHTML = html;
+            todoList.innerHTML = html;
         }
         function toggleTodo(index) {
             todos[index].completed = !todos[index].completed;
-            localStorage.setItem('study_todos', JSON.stringify(todos));
+            localStorage.setItem(STORAGE_KEYS.TODOS, JSON.stringify(todos));
             renderTodos();
         }
 
         function deleteTodo(index) {
             todos.splice(index, 1);
-            localStorage.setItem('study_todos', JSON.stringify(todos));
+            localStorage.setItem(STORAGE_KEYS.TODOS, JSON.stringify(todos));
             renderTodos();
         }
 
         // エンターキーでもTo Doを追加できるように設定
-        document.getElementById('todoInput').addEventListener('keypress', (e) => {
+        todoInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') addTodo();
         });
 
         // 💾 保存されているポモドーロ設定を読み込む
         const savedPomodoro = JSON.parse(
-            localStorage.getItem('pomodoro_settings')
+            localStorage.getItem(STORAGE_KEYS.POMODORO)
         );
 
         if (savedPomodoro) {
-            document.getElementById('workMinutes').value = savedPomodoro.work;
-            document.getElementById('breakMinutes').value = savedPomodoro.rest;
+            workMinutesInput.value = savedPomodoro.work;
+            breakMinutesInput.value = savedPomodoro.rest;
         }
 
         // 初回読み込み時にTo Doリストを描画
@@ -298,8 +324,8 @@
 
             clearInterval(timerIdx);
 
-            const work = Number(document.getElementById('workMinutes').value);
-            const rest = Number(document.getElementById('breakMinutes').value);
+            const work = Number(workMinutesInput.value);
+            const rest = Number(breakMinutesInput.value);
 
             if (isPomodoroWorking) {
                 pomodoroStudyMinutes += work;
@@ -328,9 +354,9 @@
             if (currentMode !== 'pomodoro') return;
 
             const mins = isPomodoroWorking
-                ? Number(document.getElementById('workMinutes').value)
-                : Number(document.getElementById('breakMinutes').value);
+                ? Number(workMinutesInput.value)
+                : Number(breakMinutesInput.value);
 
-            document.getElementById('timerDisplay').innerText =
+            timerDisplay.innerText =
                 `${String(mins).padStart(2, '0')}:00`;
         }
